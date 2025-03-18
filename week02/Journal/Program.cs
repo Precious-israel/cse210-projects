@@ -1,46 +1,81 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 public class Entry
 {
+    public string Date { get; set; }
+    public string Title { get; set; }
     public string Prompt { get; set; }
     public string Response { get; set; }
-    public string Date { get; set; }
+    public string Mood { get; set; }
+    public string Tags { get; set; } // Comma-separated tags
 }
 
 public class Journal
 {
-    private List<Entry> _entries = new List<Entry>();
-    private static Random _random = new Random();
+    private readonly List<Entry> _entries = new List<Entry>();
+    private static readonly Random _random = new Random();
 
-    private static List<string> _prompts = new List<string>
+    private static readonly List<string> _prompts = new List<string>
     {
         "Who was the most interesting person I interacted with today?",
         "What was the best part of my day?",
         "How did I see the hand of the Lord in my life today?",
         "What was the strongest emotion I felt today?",
         "If I had one thing I could do over today, what would it be?",
-        "who exactly disttrupted my activity today?",
-        "what is my greatest achievement today?",
+        "Who exactly disrupted my activity today?",
+        "What is my greatest achievement today?",
         "Did I win any soul for Christ today?"
     };
 
     public void AddEntry()
     {
+        string date = DateTime.Now.ToString("yyyy-MM-dd");
+        Console.Write("Enter a title for your journal entry: ");
+        string title = Console.ReadLine();
+
         string prompt = _prompts[_random.Next(_prompts.Count)];
         Console.WriteLine(prompt);
+        Console.Write("Your response: ");
         string response = Console.ReadLine();
-        string date = DateTime.Now.ToString("yyyy-MM-dd");
 
-        _entries.Add(new Entry { Prompt = prompt, Response = response, Date = date });
+        Console.Write("How was your mood? (e.g., Happy, Sad, Excited): ");
+        string mood = Console.ReadLine();
+
+        Console.Write("Enter tags for this entry (comma-separated): ");
+        string tags = Console.ReadLine();
+
+        _entries.Add(new Entry
+        {
+            Date = date,
+            Title = title,
+            Prompt = prompt,
+            Response = response,
+            Mood = mood,
+            Tags = tags
+        });
+
+        Console.WriteLine("Entry added successfully!\n");
     }
 
     public void DisplayEntries()
     {
+        if (_entries.Count == 0)
+        {
+            Console.WriteLine("No journal entries available.\n");
+            return;
+        }
+
         foreach (var entry in _entries)
         {
-            Console.WriteLine($"{entry.Date} - {entry.Prompt}");
-            Console.WriteLine(entry.Response);
-            Console.WriteLine();
+            Console.WriteLine($"Date: {entry.Date}");
+            Console.WriteLine($"Title: {entry.Title}");
+            Console.WriteLine($"Prompt: {entry.Prompt}");
+            Console.WriteLine($"Response: {entry.Response}");
+            Console.WriteLine($"Mood: {entry.Mood}");
+            Console.WriteLine($"Tags: {entry.Tags}");
+            Console.WriteLine(new string('-', 40));
         }
     }
 
@@ -50,29 +85,51 @@ public class Journal
         {
             foreach (var entry in _entries)
             {
-                writer.WriteLine($"{entry.Date}|{entry.Prompt}|{entry.Response}");
+                writer.WriteLine($"{entry.Date}|{entry.Title}|{entry.Prompt}|{entry.Response}|{entry.Mood}|{entry.Tags}");
             }
         }
+
+        Console.WriteLine("Journal saved successfully!\n");
     }
 
     public void LoadFromFile(string filename)
     {
+        if (!File.Exists(filename))
+        {
+            Console.WriteLine("File not found.\n");
+            return;
+        }
+
         _entries.Clear();
         string[] lines = File.ReadAllLines(filename);
 
         foreach (var line in lines)
         {
             string[] parts = line.Split('|');
-            _entries.Add(new Entry { Date = parts[0], Prompt = parts[1], Response = parts[2] });
+            if (parts.Length == 6)
+            {
+                _entries.Add(new Entry
+                {
+                    Date = parts[0],
+                    Title = parts[1],
+                    Prompt = parts[2],
+                    Response = parts[3],
+                    Mood = parts[4],
+                    Tags = parts[5]
+                });
+            }
         }
+
+        Console.WriteLine("Journal loaded successfully!\n");
     }
 }
+
 public class Program
 {
     public static void Main(string[] args)
     {
         Journal journal = new Journal();
-        string choice = "";
+        string choice = string.Empty;
 
         while (choice != "5")
         {
@@ -103,11 +160,13 @@ public class Program
                     string loadFilename = Console.ReadLine();
                     journal.LoadFromFile(loadFilename);
                     break;
+                case "5":
+                    Console.WriteLine("Goodbye!");
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.\n");
+                    break;
             }
         }
     }
 }
-
-
-
-
