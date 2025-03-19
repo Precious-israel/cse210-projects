@@ -2,10 +2,24 @@ using System;
 
 public class Entry
 {
-    public string Date { get; set; }
-    public string Title { get; set; }
-    public string Prompt { get; set; }
-    public string Response { get; set; }
-    public string Mood { get; set; }
-    public string Tags { get; set; } // Comma-separated tags
+    private string _date;
+    private string _promptText;
+    private string _entryText;
+
+    public Entry(string date, string promptText, string entryText)
+    {
+        _date = date;
+        _promptText = promptText;
+        _entryText = entryText;
+    }
+
+    public string Date => _date;
+    public string PromptText => _promptText;
+    public string EntryText => _entryText;
+
+    public override string ToString()
+    {
+        return $"Date: {_date}\nPrompt: {_promptText}\nEntry: {_entryText}";
+    }
 }
+
