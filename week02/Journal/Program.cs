@@ -1,49 +1,49 @@
-namespace Journal
-{
-    
-}
+using System;
 
 public class Program
 {
     public static void Main(string[] args)
     {
         Journal journal = new Journal();
-        string choice = string.Empty;
+        PromptGenerator promptGenerator = new PromptGenerator();
 
-        while (choice != "5")
+        while (true)
         {
-            Console.WriteLine("Journal Menu:");
+            Console.WriteLine("Menu:");
             Console.WriteLine("1. Write a new entry");
             Console.WriteLine("2. Display the journal");
             Console.WriteLine("3. Save the journal to a file");
             Console.WriteLine("4. Load the journal from a file");
-            Console.WriteLine("5. Quit");
-            Console.Write("Enter your choice: ");
-            choice = Console.ReadLine();
+            Console.WriteLine("5. Exit");
+            Console.Write("Choose an option: ");
+            string choice = Console.ReadLine();
 
             switch (choice)
             {
                 case "1":
-                    journal.AddEntry();
+                    string prompt = promptGenerator.GetRandomPrompt();
+                    Console.WriteLine($"Prompt: {prompt}");
+                    Console.Write("Response: ");
+                    string response = Console.ReadLine();
+                    journal.AddEntry(new Entry(prompt, response, DateTime.Now.ToString("yyyy-MM-dd")));
                     break;
                 case "2":
                     journal.DisplayEntries();
                     break;
                 case "3":
-                    Console.Write("Enter filename: ");
-                    string saveFilename = Console.ReadLine();
-                    journal.SaveToFile(saveFilename);
+                    Console.Write("Enter the filename: ");
+                    string saveFile = Console.ReadLine();
+                    journal.SaveToFile(saveFile);
                     break;
                 case "4":
-                    Console.Write("Enter filename: ");
-                    string loadFilename = Console.ReadLine();
-                    journal.LoadFromFile(loadFilename);
+                    Console.Write("Enter the filename: ");
+                    string loadFile = Console.ReadLine();
+                    journal.LoadFromFile(loadFile);
                     break;
                 case "5":
-                    Console.WriteLine("Goodbye!");
-                    break;
+                    return;
                 default:
-                    Console.WriteLine("Invalid choice. Please try again.\n");
+                    Console.WriteLine("Invalid option. Please try again.");
                     break;
             }
         }

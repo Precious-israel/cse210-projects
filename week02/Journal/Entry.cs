@@ -1,25 +1,19 @@
-using System;
-
 public class Entry
 {
-    private string _date;
-    private string _promptText;
-    private string _entryText;
+    public string Prompt { get; set; }
+    public string Response { get; set; }
+    public string Date { get; set; }
 
-    public Entry(string date, string promptText, string entryText)
+    public Entry(string prompt, string response, string date)
     {
-        _date = date;
-        _promptText = promptText;
-        _entryText = entryText;
+        Prompt = prompt;
+        Response = response;
+        Date = date;
     }
-
-    public string Date => _date;
-    public string PromptText => _promptText;
-    public string EntryText => _entryText;
 
     public override string ToString()
     {
-        return $"Date: {_date}\nPrompt: {_promptText}\nEntry: {_entryText}";
+        return $"Date: {Date}\nPrompt: {Prompt}\nResponse: {Response}\n";
     }
 }
 
