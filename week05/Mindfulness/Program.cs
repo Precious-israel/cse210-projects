@@ -62,4 +62,16 @@ public class Program
             }
         }
     }
+    // Method to simulate animation during activity execution
+    static void SimulateAnimation(int duration)
+    {
+        for (int i = 0; i < duration; i++)
+        {
+            Console.Write(".");
+            Thread.Sleep(500); // Adjust the delay as needed
+        }
+        Console.WriteLine(); // Move to the next line after animation
+    }
 }
+
+
