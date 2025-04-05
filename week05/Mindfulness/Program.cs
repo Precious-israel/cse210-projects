@@ -1,4 +1,7 @@
 using System;
+
+using System.Threading; // Required for Thread.Sleep
+
 public class Program
 {
     static void Main()
@@ -36,10 +39,16 @@ public class Program
                     // Perform the activity with the given duration
                     activities[choice].PerformActivity(duration);
 
+                    // Pause the program for 3 seconds after performing the activity
+                    Thread.Sleep(3000);
+
                     // Display the count of activities performed
                     foreach (var activity in Activity.ActivityCount)
                     {
                         Console.WriteLine($"{activity.Key} has been performed {activity.Value} times.");
+
+                        // Pause for 2 seconds between displaying each activity count
+                        Thread.Sleep(2000);
                     }
                 }
                 else
