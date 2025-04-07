@@ -2,15 +2,22 @@ using System;
 
 public abstract class Shape
 {
-    // Color property
-    public string Color { get; set; }
+    public string _color;
 
     // Constructor that accepts color
     public Shape(string color)
     {
-        Color = color;
+        _color = color;
     }
 
-    // Abstract method for calculating area
-    public abstract double GetArea();
+    public string GetColor()
+    {
+        return _color;
+    }
+
+    public void SetColor(string color)
+    {
+        _color = color;
+    }
+ public abstract double GetArea();
 }
