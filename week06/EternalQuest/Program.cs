@@ -1,30 +1,40 @@
 using System;
 
-public class Program
+
+class Program
 {
-    public static void Main()
+    static void Main()
     {
-        GoalManager goalManager = new GoalManager("Player1");
+        GoalManager manager = new GoalManager();
+        bool running = true;
 
-        // Corrected CreateGoal calls with proper arguments
-        goalManager.CreateGoal("Read Scriptures", "Read scriptures every day", 100, isEternalGoal: true);
-        goalManager.CreateGoal("Attend Temple", "Attend the temple 10 times", 50, target: 10, isEternalGoal: false);
+        while (running)
+        {
+            Console.WriteLine("\n===== Eternal Quest Menu =====");
+            Console.WriteLine("1. Create New Goal");
+            Console.WriteLine("2. List Goals");
+            Console.WriteLine("3. Record Goal Event");
+            Console.WriteLine("4. Show Score");
+            Console.WriteLine("5. Save Goals");
+            Console.WriteLine("6. Load Goals");
+            Console.WriteLine("7. Quit");
+            Console.Write("Select an option: ");
+            string input = Console.ReadLine();
 
-        // Display goals and scores
-        goalManager.DisplayGoals();
-        goalManager.DisplayScore();
+            switch (input)
+            {
+                case "1": manager.CreateGoal(); break;
+                case "2": manager.ShowGoals(); break;
+                case "3": manager.RecordEvent(); break;
+                case "4": manager.ShowScore(); break;
+                case "5": manager.SaveGoals(); break;
+                case "6": manager.LoadGoals(); break;
+                case "7": running = false; break;
+                default: Console.WriteLine("Invalid choice."); break;
+            }
+        }
 
-        // Record some events
-        goalManager.RecordEvent("Read Scriptures");
-        goalManager.RecordEvent("Attend Temple");
-
-        // Save and Load Goals
-        string filePath = "goals.json";
-        goalManager.SaveGoals(filePath);
-        goalManager.LoadGoals(filePath);
-
-        // Display player info and goal details
-        goalManager.DisplayPlayerInfo();
-        goalManager.ListGoalDetails();
+        Console.WriteLine("Thanks for playing Eternal Quest! Keep striving!");
     }
 }
+

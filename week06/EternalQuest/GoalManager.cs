@@ -1,126 +1,125 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 
 public class GoalManager
 {
     private List<Goal> goals = new List<Goal>();
     private int score = 0;
-    private string playerName;
 
-    public GoalManager(string playerName)
+    public void CreateGoal()
     {
-        this.playerName = playerName;
-    }
+        Console.WriteLine("Choose goal type:");
+        Console.WriteLine("1. Simple Goal");
+        Console.WriteLine("2. Eternal Goal");
+        Console.WriteLine("3. Checklist Goal");
+        Console.Write("Option: ");
+        string input = Console.ReadLine();
 
-    public void AddGoal(Goal goal)
-    {
-        goals.Add(goal);
-    }
+        Console.Write("Enter goal name: ");
+        string name = Console.ReadLine();
+        Console.Write("Enter goal description: ");
+        string description = Console.ReadLine();
+        Console.Write("Enter point value: ");
+        int points = int.Parse(Console.ReadLine());
 
-    public void RecordEvent(string goalName)
-    {
-        foreach (var goal in goals)
+        Goal goal = null;
+        switch (input)
         {
-            if (goal.Name == goalName)
-            {
-                int pointsEarned = goal.RecordEvent();
-                score += pointsEarned;
-                Console.WriteLine($"Event recorded for '{goalName}'! Points earned: {pointsEarned}");
+            case "1":
+                goal = new SimpleGoal(name, description, points);
+                break;
+            case "2":
+                goal = new EternalGoal(name, description, points);
+                break;
+            case "3":
+                Console.Write("How many times must it be completed? ");
+                int count = int.Parse(Console.ReadLine());
+                Console.Write("Bonus points on final completion: ");
+                int bonus = int.Parse(Console.ReadLine());
+                goal = new ChecklistGoal(name, description, points, count, bonus);
+                break;
+            default:
+                Console.WriteLine("Invalid option.");
                 return;
-            }
         }
-        Console.WriteLine("Goal not found.");
+
+        goals.Add(goal);
+        Console.WriteLine("Goal added!");
     }
 
-    public void DisplayGoals()
+    public void RecordEvent()
     {
-        foreach (var goal in goals)
+        ShowGoals();
+        Console.Write("Which goal did you complete? (Enter number): ");
+        int index = int.Parse(Console.ReadLine()) - 1;
+
+        if (index >= 0 && index < goals.Count)
         {
-            goal.Display();
+            int earned = goals[index].RecordEvent();
+            score += earned;
+            Console.WriteLine($"You earned {earned} points! Total score: {score}");
         }
     }
 
-    public void DisplayScore()
+    public void ShowGoals()
     {
-        Console.WriteLine($"Your current score: {score}");
+        if (goals.Count == 0)
+        {
+            Console.WriteLine("No goals set yet.");
+            return;
+        }
+
+        for (int i = 0; i < goals.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {goals[i].GetStatus()}");
+        }
     }
 
-    public void SaveGoals(string filePath)
+    public void ShowScore()
     {
-        var data = new Dictionary<string, object>
-        {
-            { "Goals", goals.ConvertAll(goal => goal.Save()) },
-            { "Score", score },
-            { "PlayerName", playerName }
-        };
-
-        var jsonString = JsonSerializer.Serialize(data);
-        File.WriteAllText(filePath, jsonString);
-        Console.WriteLine("Goals saved successfully.");
+        Console.WriteLine($"🏅 Your current score: {score}");
     }
 
-    public void LoadGoals(string filePath)
+    public void SaveGoals()
     {
-        if (File.Exists(filePath))
+        using (StreamWriter writer = new StreamWriter("goals.txt"))
         {
-            var jsonString = File.ReadAllText(filePath);
-            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonString);
-
-            score = Convert.ToInt32(data["Score"]);
-            playerName = data["PlayerName"].ToString();
-            goals.Clear();
-
-            foreach (var goalData in (List<object>)data["Goals"])
+            writer.WriteLine(score);
+            foreach (var goal in goals)
             {
-                var goalDict = (Dictionary<string, object>)goalData;
-                goals.Add(Goal.Load(goalDict));
+                writer.WriteLine(goal.SaveData());
+            }
+        }
+        Console.WriteLine("Goals saved!");
+    }
+
+    public void LoadGoals()
+    {
+        if (File.Exists("goals.txt"))
+        {
+            goals.Clear();
+            string[] lines = File.ReadAllLines("goals.txt");
+            score = int.Parse(lines[0]);
+
+            for (int i = 1; i < lines.Length; i++)
+            {
+                string[] parts = lines[i].Split('|');
+                Goal g = parts[0] switch
+                {
+                    "Simple" => new SimpleGoal("", "", 0),
+                    "Eternal" => new EternalGoal("", "", 0),
+                    "Checklist" => new ChecklistGoal("", "", 0, 0, 0),
+                    _ => null
+                };
+
+                g?.LoadData(lines[i]);
+                if (g != null) goals.Add(g);
             }
 
-            Console.WriteLine("Goals and player data loaded successfully.");
+            Console.WriteLine("Goals loaded!");
         }
         else
         {
-            Console.WriteLine("No saved data found, starting fresh.");
+            Console.WriteLine("No save file found.");
         }
-    }
-
-    public void DisplayPlayerInfo()
-    {
-        Console.WriteLine($"Player Name: {playerName}");
-    }
-
-    public void ListGoalNames()
-    {
-        foreach (var goal in goals)
-        {
-            Console.WriteLine(goal.Name);
-        }
-    }
-
-    public void ListGoalDetails()
-    {
-        foreach (var goal in goals)
-        {
-            goal.Display();
-        }
-    }
-
-    public void CreateGoal(string name, string description, int points, int target = 0, bool isEternalGoal = false)
-    {
-        Goal newGoal;
-
-        if (isEternalGoal)
-        {
-            newGoal = new EternalGoal(name, description, points);
-        }
-        else
-        {
-            newGoal = new ChecklistGoal(name, description, points, target);
-        }
-
-        AddGoal(newGoal);
-        Console.WriteLine($"Goal '{name}' created.");
     }
 }

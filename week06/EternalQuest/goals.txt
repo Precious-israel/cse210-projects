@@ -1,0 +1,3 @@
+50
+Simple|go to temple|to see a friend|50|True
+Simple|meet my wife|to discuss family issues|50|False

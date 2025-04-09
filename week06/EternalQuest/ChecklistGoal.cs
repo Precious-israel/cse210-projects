@@ -1,57 +1,45 @@
 using System;
-using System.Collections.Generic;
 
 public class ChecklistGoal : Goal
 {
-    public int Target { get; set; }
-    public int CompletedCount { get; set; }
-    public bool IsCompleted { get; set; }
+    private int targetCount;
+    private int currentCount;
+    private int bonus;
 
-    public ChecklistGoal(string name, string description, int points, int target)
+    public ChecklistGoal(string name, string description, int points, int targetCount, int bonus)
         : base(name, description, points)
     {
-        Target = target;
-        CompletedCount = 0;
-        IsCompleted = false;
+        this.targetCount = targetCount;
+        this.bonus = bonus;
+        currentCount = 0;
     }
 
     public override int RecordEvent()
     {
-        CompletedCount++;
-        IsCompleted = CompletedCount >= Target;
-        return Points;
-    }
-
-    public override void Display()
-    {
-        Console.WriteLine($"[Checklist] {Name} - {Description}. Points per event: {Points}. Completed {CompletedCount}/{Target}. Completed: {IsCompleted}");
-    }
-
-    public override Dictionary<string, object> Save()
-    {
-        return new Dictionary<string, object>
+        if (currentCount < targetCount)
         {
-            { "Name", Name },
-            { "Description", Description },
-            { "Points", Points },
-            { "Target", Target },
-            { "CompletedCount", CompletedCount },
-            { "IsCompleted", IsCompleted }
-        };
+            currentCount++;
+            return currentCount == targetCount ? points + bonus : points;
+        }
+        return 0;
     }
 
-    public new static ChecklistGoal Load(Dictionary<string, object> data)
+    public override bool IsComplete() => currentCount >= targetCount;
+
+    public override string GetStatus() => $"[ {(IsComplete() ? "X" : " ")} ] {name} - {description} (Completed {currentCount}/{targetCount})";
+
+    public override string GetGoalType() => "Checklist";
+
+    public override string SaveData() => $"{GetGoalType()}|{name}|{description}|{points}|{targetCount}|{currentCount}|{bonus}";
+
+    public override void LoadData(string data)
     {
-        var goal = new ChecklistGoal(
-            data["Name"].ToString(),
-            data["Description"].ToString(),
-            Convert.ToInt32(data["Points"]),
-            Convert.ToInt32(data["Target"])
-        )
-        {
-            CompletedCount = Convert.ToInt32(data["CompletedCount"]),
-            IsCompleted = Convert.ToBoolean(data["IsCompleted"])
-        };
-        return goal;
+        var parts = data.Split('|');
+        name = parts[1];
+        description = parts[2];
+        points = int.Parse(parts[3]);
+        targetCount = int.Parse(parts[4]);
+        currentCount = int.Parse(parts[5]);
+        bonus = int.Parse(parts[6]);
     }
 }
