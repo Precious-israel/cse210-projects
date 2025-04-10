@@ -1,3 +1,4 @@
 50
-Simple|go to temple|to see a friend|50|True
-Simple|meet my wife|to discuss family issues|50|False
+Simple|take a l|walk|50|True
+Simple|speak with someone|about a busines ideal|50|False
+Eternal|go to the temple|to take the sacrament|50
